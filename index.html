@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyWeb3Token - Интерфейс</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .token-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+        .token-info h3 {
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .token-info p {
+            color: #212529;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .connect-btn:active {
+            transform: translateY(0);
+        }
+
+        .connect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-box label {
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box p {
+            color: #212529;
+            font-size: 14px;
+            word-break: break-all;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            display: block;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🟣 MyWeb3Token</h1>
+        <p class="subtitle">ERC-20 токен на блокчейне Ethereum</p>
+
+        <div class="token-info">
+            <h3>📊 Информация о токене</h3>
+            <p>MW3T</p>
+            <p style="font-size: 14px; color: #6c757d; margin-top: 5px;">Symbol: MW3T</p>
+        </div>
+
+        <button id="connectBtn" class="connect-btn">
+            🔌 Подключить MetaMask
+        </button>
+
+        <div id="status" class="status"></div>
+
+        <div id="accountInfo" class="info-box" style="display: none;">
+            <label>📍 Ваш адрес</label>
+            <p id="accountAddress">0x...</p>
+        </div>
+
+        <div id="balanceInfo" class="info-box" style="display: none;">
+            <label>💰 Баланс ETH</label>
+            <p id="balanceAmount">0 ETH</p>
+        </div>
+
+        <div class="footer">
+            <p>🔗 <a href="https://github.com/cyberluka228/my-web3-token" target="_blank">Исходный код на GitHub</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js">
+    </script>
+    <script>
+        const connectBtn = document.getElementById('connectBtn');
+        const statusDiv = document.getElementById('status');
+        const accountInfo = document.getElementById('accountInfo');
+        const balanceInfo = document.getElementById('balanceInfo');
+        const accountAddress = document.getElementById('accountAddress');
+        const balanceAmount = document.getElementById('balanceAmount');
+
+        function showStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            // Автоматически скрыть через 5 секунд
+            clearTimeout(window.statusTimeout);
+            window.statusTimeout = setTimeout(() => {
+                statusDiv.className = 'status';
+            }, 5000);
+        }
+
+        connectBtn.onclick = async () => {
+            // Проверяем наличие MetaMask
+            if (!window.ethereum) {
+                showStatus('❌ MetaMask не установлен! Установите расширение MetaMask.', 'error');
+                return;
+            }
+
+            try {
+                connectBtn.disabled = true;
+                connectBtn.innerHTML = '<span class="loading"></span> Подключение...';
+
+                // Подключаемся к MetaMask
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+
+                if (accounts.length === 0) {
+                    showStatus('❌ Нет доступных аккаунтов', 'error');
+                    connectBtn.disabled = false;
+                    connectBtn.innerHTML = '🔌 Подключить MetaMask';
+                    return;
+                }
+
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+                const balance = await provider.getBalance(address);
+
+                // Показываем информацию
+                accountAddress.textContent = address;
+                balanceAmount.textContent = `${ethers.formatEther(balance)} ETH`;
+
+                accountInfo.style.display = 'block';
+                balanceInfo.style.display = 'block';
+
+                showStatus('✅ Кошелёк успешно подключён!', 'success');
+                connectBtn.innerHTML = '✅ Подключено';
+                connectBtn.disabled = false;
+
+                // Слушаем изменения аккаунта
+                window.ethereum.on('accountsChanged', function (accounts) {
+                    if (accounts.length === 0) {
+                        accountInfo.style.display = 'none';
+                        balanceInfo.style.display = 'none';
+                        connectBtn.innerHTML = '🔌 Подключить MetaMask';
+                        showStatus('⚠️ Аккаунт отключён', 'info');
+                    } else {
+                        // Обновляем данные
+                        window.location.reload();
+                    }
+                });
+
+                // Слушаем изменения сети
+                window.ethereum.on('chainChanged', function () {
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                let errorMessage = '❌ Ошибка при подключении: ';
+                if (error.code === 4001) {
+                    errorMessage += 'пользователь отклонил запрос.';
+                } else if (error.code === -32002) {
+                    errorMessage += 'запрос уже обрабатывается. Проверьте MetaMask.';
+                } else {
+                    errorMessage += error.message || 'неизвестная ошибка.';
+                }
+                showStatus(errorMessage, 'error');
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '🔌 Подключить MetaMask';
+            }
+        };
+
+        // Проверяем, есть ли уже подключенный аккаунт при загрузке
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                try {
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const accounts = await provider.listAccounts();
+                    if (accounts.length > 0) {
+                        // Автоматически подключаемся, если уже есть разрешение
+                        connectBtn.click();
+                    }
+                } catch (error) {
+                    // Игнорируем ошибки при автоматической проверке
+                    console.log('Автоматическая проверка не удалась');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
