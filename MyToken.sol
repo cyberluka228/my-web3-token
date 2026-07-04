@@ -1,35 +1,19 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Web3 Connect</title>
-</head>
-<body>
-    <h1>🟢 Web3 Connection</h1>
-    <button id="connect">Connect Wallet</button>
-    <p id="account">Not connected</p>
-    <p id="balance">Balance: 0</p>
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
-    <script>
-        const connectBtn = document.getElementById('connect');
-        const accountDisplay = document.getElementById('account');
-        const balanceDisplay = document.getElementById('balance');
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-        connectBtn.onclick = async () => {
-            if (!window.ethereum) {
-                alert('Please install MetaMask');
-                return;
-            }
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
-            const signer = await provider.getSigner();
-            const address = await signer.getAddress();
-            const balance = await provider.getBalance(address);
+contract MyToken is ERC20, Ownable {
+    constructor() ERC20("MyWeb3Token", "MW3T") Ownable(msg.sender) {
+        _mint(msg.sender, 1_000_000 * 10 ** decimals());
+    }
 
-            accountDisplay.textContent = `Account: ${address}`;
-            balanceDisplay.textContent = `Balance: ${ethers.formatEther(balance)} ETH`;
-        };
-    </script>
-</body>
-</html>
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+    }
+
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
+    }
+}
