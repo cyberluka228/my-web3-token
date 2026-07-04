@@ -1,0 +1,14 @@
+{
+  "name": "my-web3-token",
+  "version": "1.0.0",
+  "description": "ERC-20 token with Hardhat and Solidity",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  }
+}
